@@ -3,6 +3,7 @@ package controllers;
 import model.Role;
 import model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,9 @@ public class AdminController {
 
     @Autowired
     private AppService appService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping
     public String admin() {
@@ -44,35 +48,52 @@ public class AdminController {
 
     @PostMapping("/users/create")
     public String create(@ModelAttribute("user") User user, HttpServletRequest request) {
+        user.setPassword(passwordEncoder.encode(request.getParameter("password")));
+
         String[] userRoles = request.getParameterValues("userRoles");
         List<Role> list = new ArrayList<>();
         for(String role: userRoles) {
-            list.add(appService.createRoleIfNotFound(role));
+            list.add(appService.findRoleByName(role));
         }
         user.setUserRoles(list);
         appService.createUser(user);
         return "redirect:/admin/users";
     }
 
-    @GetMapping("/users/{id}/edit")
+    @GetMapping("/users/edit/{id}")
     public String edit(Model model, @PathVariable("id") long id) {
         model.addAttribute("user", appService.readUser(id));
         return "edit";
     }
 
-    @PatchMapping("/users/{id}")
+    @PostMapping("/users/edit/{id}")
     public String update(@ModelAttribute("user") User user, @PathVariable("id") long id, HttpServletRequest request) {
-        String[] userRoles = request.getParameterValues("userRoles");
-        List<Role> list = new ArrayList<>();
-        for(String role: userRoles) {
-            list.add(appService.createRoleIfNotFound(role));
+
+        if (request.getParameter("login").isEmpty()) {
+            user.setLogin(appService.readUser(id).getLogin());
         }
-        user.setUserRoles(list);
+
+        if (request.getParameter("password").isEmpty()) {
+            user.setPassword(appService.readUser(id).getPassword());
+        } else {
+            user.setPassword(passwordEncoder.encode(request.getParameter("password")));
+        }
+
+        String[] userRoles = request.getParameterValues("userRoles");
+        if (userRoles == null) {
+            user.setUserRoles(appService.readUser(id).getUserRoles());
+        } else {
+            List<Role> list = new ArrayList<>();
+            for (String role: userRoles) {
+                list.add(appService.findRoleByName(role));
+            }
+            user.setUserRoles(list);
+        }
         appService.updateUser(user);
         return "redirect:/admin/users";
     }
 
-    @DeleteMapping("/users/{id}")
+    @PostMapping("/users/delete/{id}")
     public String delete(@PathVariable("id") long id) {
         appService.deleteUser(appService.readUser(id));
         return "redirect:/admin/users";

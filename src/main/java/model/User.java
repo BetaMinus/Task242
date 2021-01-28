@@ -1,8 +1,13 @@
 package model;
 
+import com.sun.istack.NotNull;
+import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.Type;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.util.Collection;

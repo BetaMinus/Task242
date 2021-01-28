@@ -1,6 +1,8 @@
 package dao;
 import model.User;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -14,6 +16,9 @@ public class UserDaoImpl implements UserDao {
     @PersistenceContext
     EntityManager entityManager;
 
+    @Autowired
+    private PasswordEncoder encoder;
+
     public void createUser(User user) {
         entityManager.persist(user);
     }
@@ -26,9 +31,7 @@ public class UserDaoImpl implements UserDao {
         return entityManager.createQuery("FROM User").getResultList();
     }
 
-    public void updateUser(User user) {
-        entityManager.merge(user);
-    }
+    public void updateUser(User user) { entityManager.merge(user); }
 
     public void deleteUser(User user) {
         entityManager.remove(entityManager.merge(user));

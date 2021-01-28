@@ -14,18 +14,6 @@ public class RoleDaoImpl implements RoleDao {
     @PersistenceContext
     EntityManager entityManager;
 
-    public void createRole(String roleName) {
-        entityManager.persist(new Role(roleName));
-    }
-
-    public Role readRole(int id) {
-        return entityManager.find(Role.class, id);
-    }
-
-    public void updateRole(Role role) {
-        entityManager.merge(role);
-    }
-
     public Role findRoleByName(String roleName) {
         Query query = entityManager.createQuery("FROM Role where roleName=:roleName");
         query.setParameter("roleName", roleName);
@@ -36,12 +24,4 @@ public class RoleDaoImpl implements RoleDao {
         }
     }
 
-    public Role createRoleIfNotFound(String roleName) {
-        Role role = findRoleByName(roleName);
-        if (role == null) {
-            createRole(roleName);
-            role = findRoleByName(roleName);
-        }
-        return role;
-    }
 }

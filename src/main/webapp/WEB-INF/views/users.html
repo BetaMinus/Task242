@@ -33,12 +33,17 @@
               th:text="!${i.last} ? ${role.getRoleName().substring(5)+','} : ${role.getRoleName().substring(5)}">Roles
         </span>
       </td>
-      <td> <a th:href="@{/admin/users/{id}/edit(id=${user.getUserId()})}" align="center"> Edit</a> </td>
+      <td> <a th:href="@{/admin/users/edit/{id}(id=${user.getUserId()})}"
+              align="center"> Edit</a>
+      </td>
       <td>
-        <form th:method="DELETE" th:action="@{/admin/users/{id}(id=${user.getUserId()})}" align="center">
+        <form th:method="POST"
+              th:action="@{/admin/users/delete/{id}(id=${user.getUserId()})}"
+              align="center">
           <input type="submit" value="Delete">
         </form>
       </td>
+
     </tr>
 </table>
 
